@@ -14,8 +14,11 @@ const AuthContext = ({ children }) => {
 
     const readProfile = () => {
 
-        const user = { uid: "123", email: "Hassangill2005@gmail.com", name: "Zeeshan Hassan" }
-        // setState({ isAuth: true, user })
+        const user = JSON.parse(localStorage.getItem("user"))
+        if (user) {
+
+            setState({ isAuth: true, user })
+        }
         setTimeout(() => {
             setIsAppLoading(false)
         }, 1000);
@@ -25,11 +28,13 @@ const AuthContext = ({ children }) => {
 
     const handleLogout = () => {
         setState(initialState)
+        localStorage.removeItem("user")
+        setState(initialState)
     }
 
     return (
 
-        <Auth.Provider value={{ ...state, isAppLoading, handleLogout }} >
+        <Auth.Provider value={{ ...state, isAppLoading, handleLogout, dispatch: setState }} >
             {children}
         </Auth.Provider>
 
