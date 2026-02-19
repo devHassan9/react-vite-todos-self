@@ -54,6 +54,8 @@ const Login = () => {
         <div className="card p-3 p-4 mx-auto">
           <Title level={1} className="text-center">Login</Title>
           <Paragraph className="text-center" >Don't have an account? <Link to='/auth/register' >Create Account</Link> </Paragraph>
+          <Paragraph className="text-center" >Forgot Password? <Link to='/auth/forgot-password' >Reset Password</Link> </Paragraph>
+
 
           <Form layout="vertical">
             <Item label='Email' required>
