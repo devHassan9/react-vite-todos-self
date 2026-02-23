@@ -11,7 +11,7 @@ const { Title } = Typography
 const { Item } = Form
 const { Option } = Select
 
-const initialState = { title: "", dueDate: "", description: "", prirority: "" }
+const initialState = { title: "", dueDate: "", description: "", priority: "" }
 
 const Add = () => {
 
@@ -27,13 +27,13 @@ const Add = () => {
 
     const handleSubmit = () => {
 
-        let { title, dueDate, description, prirority } = state
+        let { title, dueDate, description, priority } = state
 
         title = title.trim()
 
         if (title.length < 3) { return window.toastify("Please enter a valid title", "error") }
 
-        const todo = { title, dueDate, description, prirority }
+        const todo = { title, dueDate, description, priority }
         todo.uid = user.uid
         todo.id = window.getRandomId()
         todo.status = "active"
