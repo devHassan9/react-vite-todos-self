@@ -2,7 +2,7 @@ import { Button, Form } from "antd"
 import { Input } from "antd"
 import { Typography } from "antd"
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../../../Context/Auth"
 import { DatePicker } from "antd"
 import { Select } from "antd"
@@ -11,12 +11,11 @@ const { Title } = Typography
 const { Item } = Form
 const { Option } = Select
 
-const initialState = { title: "", dueDate: "", description: "", priority: "" }
+const initialState = { title: "", dueDate: "", description: "", prirority: "" }
 
 const Add = () => {
 
-
-    const { dispatch } = useAuth()
+    const { user } = useAuth()
 
     const [state, setState] = useState(initialState)
     const [isProcessing, setIsProcessing] = useState(false)
@@ -26,27 +25,30 @@ const Add = () => {
 
     const handleChange = e => setState(s => ({ ...s, [e.target.name]: e.target.value }))
 
-    const handleLogin = () => {
+    const handleSubmit = () => {
 
-        let { title, dueDate, description, priority } = state
+        let { title, dueDate, description, prirority } = state
 
         title = title.trim()
 
-        if (title.length < 3) { return window.toastify("Please enter full title", "error") }
+        if (title.length < 3) { return window.toastify("Please enter a valid title", "error") }
 
-        const todo = {uid: user.uid ,id: window.getRandomId(), title, dueDate, description, priority, status: "active", isCompleted: "false" }
+        const todo = { title, dueDate, description, prirority }
+        todo.uid = user.uid
+        todo.id = window.getRandomId()
+        todo.status = "active"
+        todo.isCompleted = false
+        todo.createdAt = new Date().getTime()
 
         setIsProcessing(true)
+
         const todos = JSON.parse(localStorage.getItem("todos")) || []
 
-        todos.unshift(todo)
-
+        todos.push(todo)
+        localStorage.setItem("todos", JSON.stringify(todos))
         setTimeout(() => {
-            localStorage.setItem("user", JSON.stringify(user))
-            dispatch({ isAuth: true, user })
-            navigate("/dashboard")
             setIsProcessing(false)
-            window.toastify("Login successful", "success")
+            window.toastify("TODO Created", "success")
         }, 500);
 
     }
@@ -55,25 +57,28 @@ const Add = () => {
         <main className='auth flex-center'>
             <div className="container">
                 <div className="card p-3 p-4 mx-auto">
-                    <Title level={1} className="text-center">Add Todo</Title>
+                    <div className="d-flex mb-4 align-items-center justify-content-between">
+                        <Title level={2} className="mb-0">Add Todo</Title>
+                        <Button type="primary" onClick={() => { navigate("/dashboard/todos") }} >Todos</Button>
+                    </div>
                     <Form layout="vertical">
                         <Item label='Title' required>
-                            <Input type='text' size="large" placeholder="Enter title" name="title" onChange={handleChange} />
+                            <Input type='text' size="large" placeholder="Enter Title" name="title" onChange={handleChange} />
                         </Item>
                         <Item label='Due Date'>
-                            <DatePicker placeholder="Enter due date" name="dueDate" className="w-100" onChange={handleChange} />
+                            <DatePicker size="large" placeholder="Enter Due Date" className="w-100" onChange={(obj, dueDate) => { setState(s => ({ ...s, dueDate })) }} />
                         </Item>
-                        <Item label='Description'>
-                            <Input.TextArea placeholder="Enter description" name="description" onChange={handleChange} style={{ height: 100, resize: "none" }} />
+                        <Item label='Description' >
+                            <Input.TextArea placeholder="Enter Description" name="description" onChange={handleChange} style={{ height: 100, resize: "none" }} />
                         </Item>
-                        <Item label='Priority'>
-                            <Select size="large" placeholder="Select Priority" >
-                                <Option value="low" >Low</Option>
-                                <Option value="medium" >Medium</Option>
-                                <Option value="high" >High</Option>
+                        <Item label="Priority" >
+                            <Select size="large" placeholder="Select Priority" onChange={(priority) => { setState(s => ({ ...s, priority })) }} >
+                                <Option value="low">Low</Option>
+                                <Option value="medium">Medium</Option>
+                                <Option value="high">High</Option>
                             </Select>
                         </Item>
-                        <Button type="primary" size="large" block htmlType="submit" loading={isProcessing} onClick={handleLogin} >Add Todo</Button>
+                        <Button type="primary" size="large" block htmlType="submit" loading={isProcessing} onClick={handleSubmit} >Create TODO</Button>
                     </Form>
                 </div>
             </div>
